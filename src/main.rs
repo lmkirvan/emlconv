@@ -1,74 +1,23 @@
-mod api;
 use std::path::PathBuf;
-use clap::{Parser, Subcommand, Args};
-#[derive(Parser)]
-#[command(author, version)]
-#[command(
-    about = "stringer - a simple CLI to transform and inspect strings"
-    , long_about = "stringer is a super fancy CLI (kidding)
-    One can use stringer to modify or inspect strings straight from the terminal")
-    ]
-struct Cli {
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
+use clap::Parser;
 
-#[derive(Subcommand)]
-enum Commands {
-    /**
-    Reverses a string
-    */
-    Reverse(Reverse),
-    /// Inspects a string
-    Inspect(Inspect),
-}
+///convert eml to markdown
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// path to eml files 
+    #[arg(short, long)]
+    path: Vec<PathBuf>,
 
-#[derive(Args)]
-struct Reverse {
-    /// The string to reverse
-    string: Option<String>,
-}
-
-#[derive(Args)]
-struct Inspect {
-    /// The string to inspect
-    string: Option<String>,
-    #[arg(short = 'd', long = "digits")]
-    only_digits: bool,
+    /// subject keywords to look for
+    #[arg(short, long)]
+    subject: Vec<String>,
 }
 
 fn main() {
-    let cli = Cli::parse();
+    let args = Args::parse();
 
-    match &cli.command {
-        Some(Commands::Reverse(name)) => {
-            match name.string {
-                Some(ref _name) => {
-                    let reverse = api::stringer::reverse(_name);
-                    println!("{}", reverse);
-                }
-                None => {
-                    println!("Please provide a string to reverse")
-                }
-            }
-        }
-
-        Some(Commands::Inspect(name)) => 
-            match name.string {
-                Some(ref _name) => {
-                    let (res, kind) = api::stringer::inspect(_name, name.only_digits);
-
-                    let mut plural_s = "s";
-                    if res == 1 {
-                        plural_s = "";
-                    }
-                    println!("{:?} has {} {}{}.", _name, res, kind, plural_s);
-                }
-                None => {
-                    println!("Please provide a string to inspect")
-                }
-
-            }
-        None => {}
+    for arg in args.path {
+        println!("Hello {}!", arg.display())
     }
 }
