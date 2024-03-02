@@ -1,57 +1,17 @@
-use std::vec;
 use regex::Regex;
-use clap::{Parser, builder::Str};
+use clap::{Parser};
 use anyhow::{Context, Result, Ok};
 
-struct Eml {
-    mime_version: String,
-    date: String,
-    subject: String,
-    from: String,
-    to: String,
-    boundary: String, 
-    body: String
+fn get_boundary(content: &str) -> &str {
+    let re = Regex::new(r"(boundary=)").unwrap();
+
+    let Some(caps) = re.captures(content) else {
+        println!("no match!");
+        panic!()
+    };
+    let res = &caps[0];
+    res
 }
-
-fn find_matches(content: &str, pattern: &str) {
-    for line in content.lines() {
-        if line.starts_with(pattern) {
-            return line.into( ));
-        }
-    }
-}
-
-fn get_boundary(content: &str) {
-    let re = Regex::new(r"boundary=\"(.+)\"").unwrap();
-    
-
-
-
-
-}
-
-
-
-fn handle_contents(content){
-
-    let email: Eml = Eml {
-
-        mime_version = find_matches(content, "MIME-Version:"), 
-        date = find_matches(content, "Date:"),
-        subject = find_matches(content, "Subject:"),
-        from = find_matches(content, "From:"),
-        to = find_matches(content, "To:"),
-
-
-
-
-
-    }
-    
-}
-
-
-
 
 ///This converts eml to markdown
 #[derive(Parser)]
@@ -65,30 +25,12 @@ struct Cli {
 fn main() -> Result<()> {
     let args = Cli::parse();
     let content = std::fs::read_to_string(&args.path)
-        .with_context(|| format!("Could not read file '{}'",
-         args.path.display()))?;
+        .with_context(|| format!("Could not read file '{}'" , args.path.display()))?;
 
-    println!("{}", content);
+    let boundary = get_boundary(&content);
 
-    // println!("is this the content length ? {x}");   
-
-    let email = Eml {
-        mime_version: handle_line(string, pattern)
-    }
-
-    let mut counter = 0; 
-
-
-    for line in content.lines(){
-        //if line.contains(&args.pattern){
-        //    println!("{}", line);
-       // }
-       println!("{}", line);
-
-       println!("{}", counter);
-       counter = counter + 1; 
-    }   
-
+    println!("the boundary is {}", boundary);
+    
     Ok(())
 
 }
